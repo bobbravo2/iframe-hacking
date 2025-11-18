@@ -202,7 +202,7 @@
         
         // Navigate to page 1
         function navigateToPage1() {
-            window.location.href = '/iframe.html';
+            window.location.href = 'iframe.html';
             document.getElementById('nav-output').innerHTML = 
                 '<span class="info">Navigating to Page 1...</span>';
         }
@@ -212,7 +212,7 @@
             try {
                 const iframe = window.parent.document.getElementById('myIframe');
                 if (iframe) {
-                    iframe.src = '/iframe.html';
+                    iframe.src = 'iframe.html';
                     document.getElementById('nav-output').innerHTML = 
                         '<span class="success">✓ Requested parent to navigate iframe</span>';
                 }

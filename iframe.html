@@ -457,7 +457,7 @@
         // Navigation: Navigate to Page 2
         function navigateToPage2() {
             try {
-                window.location.href = '/iframe-page2.html';
+                window.location.href = 'iframe-page2.html';
                 document.getElementById('nav-output').innerHTML = 
                     '<span class="info">Navigating to Page 2...</span>';
             } catch (e) {
@@ -470,7 +470,7 @@
             try {
                 const iframe = window.parent.document.getElementById('myIframe');
                 if (iframe) {
-                    iframe.src = '/iframe-page2.html';
+                    iframe.src = 'iframe-page2.html';
                     document.getElementById('nav-output').innerHTML = 
                         '<span class="success">✓ Requested parent to navigate to Page 2</span>';
                 }
