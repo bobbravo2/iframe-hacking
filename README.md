@@ -49,9 +49,18 @@ This project demonstrates how parent windows and iframes can interact with each 
 npm install
 ```
 
-## Running the Server
+## Live Demo
+
+🌐 **[View Live Demo on GitHub Pages](https://bobbravo2.github.io/iframe-hacking/)**
+
+The demo is automatically deployed to GitHub Pages via GitHub Actions whenever changes are pushed to the main branch.
+
+## Running Locally
+
+For local development, you can use the included Express server:
 
 ```bash
+npm install
 npm start
 ```
 
@@ -65,11 +74,17 @@ The server will start on `http://localhost:3000`
 
 ## Usage
 
-1. Start the server using `npm start`
-2. Open your browser and navigate to `http://localhost:3000`
-3. Use the interactive buttons to test different iframe DOM methods
-4. Observe the outputs to see the results of each operation
-5. Try buttons in both the parent page and inside the iframe content
+### Online Demo
+1. Visit the [live demo](https://bobbravo2.github.io/iframe-hacking/)
+2. Use the interactive buttons to test different iframe DOM methods
+3. Observe the outputs to see the results of each operation
+4. Try buttons in both the parent page and inside the iframe content
+
+### Local Development
+1. Install dependencies: `npm install`
+2. Start the server: `npm start`
+3. Open your browser and navigate to `http://localhost:3000`
+4. Experiment with the iframe DOM methods interactively
 
 ## Key DOM Methods Demonstrated
 
@@ -131,6 +146,24 @@ This demo is for educational purposes and demonstrates same-origin iframe intera
 - Consider using `postMessage()` for more structured communication
 - Implement proper Content Security Policy (CSP) headers
 - Be aware of clickjacking vulnerabilities with iframes
+
+## Deployment
+
+This project is automatically deployed to GitHub Pages using GitHub Actions. The workflow:
+
+1. Triggers on every push to the `main` branch
+2. Deploys all static files (HTML, CSS, JS) to GitHub Pages
+3. Makes the demo accessible at: https://bobbravo2.github.io/iframe-hacking/
+
+**Note:** The Express server (`server.js`) is only needed for local development. GitHub Pages serves the HTML files directly as static content.
+
+### Manual Deployment
+
+You can also trigger a deployment manually:
+1. Go to the repository on GitHub
+2. Click on "Actions" tab
+3. Select "Deploy to GitHub Pages" workflow
+4. Click "Run workflow"
 
 ## License
 
