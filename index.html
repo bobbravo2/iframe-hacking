@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iframe DOM Methods Demo - Parent Page</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 500px 1fr;
+            gap: 20px;
+            padding: 20px;
+            max-width: none;
+        }
+        
+        @media (max-width: 1200px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .panel {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+        }
+        
+        .panel h2 {
+            color: #667eea;
+            margin-bottom: 12px;
+            font-size: 1.3em;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 8px;
+        }
+        
+        .controls-column {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto;
+            max-height: calc(100vh - 200px);
+        }
+        
+        .iframe-column {
+            display: flex;
+            flex-direction: column;
+            position: sticky;
+            top: 20px;
+            height: calc(100vh - 40px);
+        }
+        
+        .iframe-container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+        
+        iframe {
+            width: 100%;
+            flex: 1;
+            min-height: 0;
+            border: 2px dashed #FF0000;
+            border-radius: 4px;
+        }
+        
+        @media (max-width: 1200px) {
+            .controls-column {
+                max-height: none;
+            }
+            
+            .iframe-column {
+                position: relative;
+                height: auto;
+            }
+            
+            .iframe-container {
+                min-height: 500px;
+            }
+            
+            iframe {
+                min-height: 400px;
+            }
+        }
+        
+        .control-group {
+            margin-bottom: 12px;
+        }
+        
+        .control-group label {
+            display: block;
+            font-weight: bold;
+            color: #495057;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px 5px 5px 0;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            border: 2px solid #dee2e6;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .output {
+            background: #fff;
+            border: 2px solid #dee2e6;
+            border-radius: 4px;
+            padding: 10px;
+            margin-top: 10px;
+            min-height: 60px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: #212529;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .parent-demo-element {
+            background: #e7f3ff;
+            border: 2px solid #2196F3;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        
+        .success {
+            color: #28a745;
+            font-weight: bold;
+        }
+        
+        .info {
+            color: #17a2b8;
+        }
+        
+        code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #e83e8c;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧭 Iframe History & Navigation API Demo</h1>
+            <p>Interactive demonstration of History API, navigation, and DOM methods for same-origin iframes</p>
+        </div>
+        
+        <div class="main-content">
+            <!-- Left Column: Controls -->
+            <div class="controls-column">
+            
+            <!-- History & Navigation Controls - PRIMARY SECTION -->
+            <div class="panel" style="border: 3px solid #667eea; background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);">
+                <h2 style="font-size: 1.5em;">🧭 History & Navigation API</h2>
+                
+                <div class="control-group">
+                    <label>Iframe Navigation</label>
+                    <button onclick="navigateIframeTo('/iframe.html')" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">📄 Load Page 1</button>
+                    <button onclick="navigateIframeTo('/iframe-page2.html')" style="background: linear-gradient(135deg, #43cea2 0%, #185a9d 100%);">📄 Load Page 2</button>
+                    <div class="output" id="nav-load-output" style="font-size: 12px; min-height: 30px;">Click to navigate iframe...</div>
+                </div>
+                
+                <div class="control-group">
+                    <label>History Navigation</label>
+                    <button onclick="iframeBack()">⬅️ history.back()</button>
+                    <button onclick="iframeForward()">➡️ history.forward()</button>
+                    <button onclick="iframeGo(-2)">⬅️⬅️ go(-2)</button>
+                    <button onclick="iframeGo(1)">➡️ go(1)</button>
+                    <div class="output" id="history-nav-output" style="font-size: 12px; min-height: 30px;">Navigate iframe history...</div>
+                </div>
+                
+                <div class="control-group">
+                    <label>History State Manipulation</label>
+                    <button onclick="iframePushState()">pushState()</button>
+                    <button onclick="iframeReplaceState()">replaceState()</button>
+                    <button onclick="showIframeHistoryState()">Show State</button>
+                    <button onclick="showIframeHistoryLength()">Show Length</button>
+                    <div class="output" id="history-state-output" style="font-size: 12px;">State manipulation results...</div>
+                </div>
+                
+                <div class="control-group">
+                    <label>URL Manipulation</label>
+                    <button onclick="getIframeLocation()">Get Location</button>
+                    <button onclick="getIframeURL()">Get Full URL</button>
+                    <button onclick="parseIframeURL()">Parse URL</button>
+                    <button onclick="changeIframeHash()">Change Hash</button>
+                    <div class="output" id="url-output" style="font-size: 12px;">URL information...</div>
+                </div>
+                
+                <div class="control-group">
+                    <label>Reload & Refresh</label>
+                    <button onclick="reloadIframe()">🔄 Reload</button>
+                    <button onclick="hardReloadIframe()">🔄 Hard Reload</button>
+                    <button onclick="reloadIframeNoCache()">🔄 No Cache</button>
+                    <div class="output" id="reload-output" style="font-size: 12px; min-height: 30px;">Reload controls...</div>
+                </div>
+                
+                <div class="control-group">
+                    <label>ScrollRestoration</label>
+                    <button onclick="setScrollRestorationAuto()">Set Auto</button>
+                    <button onclick="setScrollRestorationManual()">Set Manual</button>
+                    <button onclick="getScrollRestoration()">Get Current</button>
+                    <div class="output" id="scroll-restoration-output" style="font-size: 12px; min-height: 30px;">Scroll restoration mode...</div>
+                </div>
+            </div>
+            
+            <!-- Parent → Iframe Controls -->
+            <div class="panel">
+                <h2>Parent → Iframe DOM</h2>
+                
+                <div class="control-group">
+                    <label>Access iframe's contentWindow & contentDocument</label>
+                    <button onclick="accessIframeWindow()">Get contentWindow</button>
+                    <button onclick="accessIframeDocument()">Get contentDocument</button>
+                    <div class="output" id="access-output"></div>
+                </div>
+                
+                <div class="control-group">
+                    <label>Modify Iframe DOM</label>
+                    <button onclick="changeIframeText()">Change Text</button>
+                    <button onclick="changeIframeStyle()">Change Style</button>
+                    <button onclick="addIframeElement()">Add Element</button>
+                    <div class="output" id="modify-output"></div>
+                </div>
+                
+                <div class="control-group">
+                    <label>Call Iframe Functions</label>
+                    <button onclick="callIframeFunction()">Call Function</button>
+                    <button onclick="getIframeVariable()">Get Variable</button>
+                    <div class="output" id="function-output"></div>
+                </div>
+                
+                <div class="control-group">
+                    <label>Query Iframe DOM</label>
+                    <button onclick="queryIframeElements()">Query Elements</button>
+                    <button onclick="getIframeTitle()">Get Title</button>
+                    <div class="output" id="query-output"></div>
+                </div>
+            </div>
+            
+            <!-- Iframe → Parent Controls -->
+            <div class="panel">
+                <h2>Iframe → Parent (via buttons in iframe)</h2>
+                
+                <div class="control-group">
+                    <label>Parent Demo Element (can be modified by iframe)</label>
+                    <div class="parent-demo-element" id="parent-demo">
+                        This is a parent element with ID: <code>parent-demo</code>
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <label>Parent Input (can be modified by iframe)</label>
+                    <input type="text" id="parent-input" value="Parent value" />
+                </div>
+                
+                <div class="control-group">
+                    <label>Parent Output (messages from iframe)</label>
+                    <div class="output" id="parent-output">Waiting for messages from iframe...</div>
+                </div>
+            </div>
+            
+            <!-- Advanced Methods -->
+            <div class="panel">
+                <h2>Advanced Methods</h2>
+                
+                <div class="control-group">
+                    <label>Event Handling</label>
+                    <button onclick="addIframeEventListener()">Add Event Listener</button>
+                    <button onclick="triggerIframeEvent()">Trigger Event in Iframe</button>
+                    <div class="output" id="event-output"></div>
+                </div>
+                
+                <div class="control-group">
+                    <label>Window Properties</label>
+                    <button onclick="checkWindowRelationship()">Check Relationship</button>
+                    <button onclick="compareOrigins()">Compare Origins</button>
+                    <div class="output" id="window-output"></div>
+                </div>
+            </div>
+            
+            <!-- Method Reference -->
+            <div class="panel">
+                <h2>Method Reference</h2>
+                <div style="font-size: 14px; line-height: 1.8;">
+                    <strong>Key Properties & Methods:</strong><br>
+                    • <code>iframe.contentWindow</code> - Access iframe's window<br>
+                    • <code>iframe.contentDocument</code> - Access iframe's document<br>
+                    • <code>window.parent</code> - Access parent from iframe<br>
+                    • <code>window.top</code> - Access top-level window<br>
+                    • <code>window.frameElement</code> - Get iframe element<br>
+                    • <code>window.frames</code> - Access child frames<br>
+                    • <code>postMessage()</code> - Secure cross-frame messaging<br>
+                </div>
+            </div>
+            </div>
+            
+            <!-- Right Column: Iframe -->
+            <div class="iframe-column">
+                <div class="iframe-container">
+                    <h2 style="color: #667eea; margin-bottom: 10px;">Iframe Display</h2>
+                    <div style="margin-bottom: 10px; padding: 10px; background: rgba(102, 126, 234, 0.1); border-radius: 4px;">
+                        <strong>Current Page:</strong> <span id="current-page-indicator" style="color: #667eea;">Loading...</span>
+                        <button onclick="showCurrentIframeInfo()" style="float: right; padding: 5px 10px; font-size: 12px;">Show Info</button>
+                    </div>
+                    <div class="output" id="navigation-output" style="margin-bottom: 10px; font-size: 12px; min-height: 40px;">Navigate using controls on the left...</div>
+                    <iframe id="myIframe" src="/iframe.html" title="Demo Iframe"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const iframe = document.getElementById('myIframe');
+        
+        // Function that can be called from iframe
+        function parentFunction(message) {
+            const output = document.getElementById('parent-output');
+            output.innerHTML = `<span class="success">✓ Function called from iframe:</span><br>${message}`;
+            return 'Response from parent function';
+        }
+        
+        // Parent variable that can be accessed from iframe
+        window.parentData = {
+            name: 'Parent Window',
+            timestamp: new Date().toISOString(),
+            sharedValue: 42
+        };
+        
+        // Wait for iframe to load
+        iframe.addEventListener('load', function() {
+            document.getElementById('access-output').innerHTML = '<span class="info">Iframe loaded! Try the buttons above.</span>';
+            updateCurrentPageIndicator();
+            
+            // Add listeners to iframe for popstate and hashchange
+            try {
+                const iframeWindow = iframe.contentWindow;
+                iframeWindow.addEventListener('popstate', function(e) {
+                    updateCurrentPageIndicator();
+                    const output = document.getElementById('navigation-output');
+                    if (output) {
+                        output.innerHTML = `<span class="info">🔔 popstate event fired in iframe</span><br>State: ${JSON.stringify(e.state)}`;
+                    }
+                });
+                
+                iframeWindow.addEventListener('hashchange', function(e) {
+                    updateCurrentPageIndicator();
+                    const output = document.getElementById('navigation-output');
+                    if (output) {
+                        output.innerHTML = `<span class="info">🔔 hashchange event fired</span><br>Old: ${e.oldURL}<br>New: ${e.newURL}`;
+                    }
+                });
+            } catch (e) {
+                console.error('Error adding iframe event listeners:', e);
+            }
+        });
+        
+        // Update current page indicator
+        function updateCurrentPageIndicator() {
+            try {
+                const iframeWindow = iframe.contentWindow;
+                const pathname = iframeWindow.location.pathname;
+                const title = iframeWindow.document.title;
+                const indicator = document.getElementById('current-page-indicator');
+                if (indicator) {
+                    let pageName = pathname;
+                    if (pathname.includes('iframe-page2')) {
+                        pageName = '📄 Page 2';
+                    } else if (pathname.includes('iframe.html')) {
+                        pageName = '📄 Page 1';
+                    }
+                    indicator.innerHTML = `${pageName} | ${title}`;
+                }
+            } catch (e) {
+                console.error('Error updating page indicator:', e);
+            }
+        }
+        
+        // Show current iframe information
+        function showCurrentIframeInfo() {
+            try {
+                const iframeWindow = iframe.contentWindow;
+                const info = `<span class="success">✓ Current Iframe Info:</span><br>` +
+                    `URL: ${iframeWindow.location.href}<br>` +
+                    `Title: ${iframeWindow.document.title}<br>` +
+                    `History Length: ${iframeWindow.history.length}<br>` +
+                    `State: ${JSON.stringify(iframeWindow.history.state) || 'null'}<br>` +
+                    `ScrollRestoration: ${iframeWindow.history.scrollRestoration}`;
+                document.getElementById('navigation-output').innerHTML = info;
+            } catch (e) {
+                document.getElementById('navigation-output').innerHTML = `Error: ${e.message}`;
+            }
+        }
+        
+        // Parent → Iframe: Access contentWindow
+        function accessIframeWindow() {
+            try {
+                const iframeWindow = iframe.contentWindow;
+                const output = document.getElementById('access-output');
+                output.innerHTML = `<span class="success">✓ Got contentWindow:</span><br>` +
+                    `Location: ${iframeWindow.location.href}<br>` +
+                    `Type: ${typeof iframeWindow}<br>` +
+                    `Constructor: ${iframeWindow.constructor.name}`;
+            } catch (e) {
+                document.getElementById('access-output').innerHTML = `Error: ${e.message}`;
+            }
+        }
+        
+        // Parent → Iframe: Access contentDocument
+        function accessIframeDocument() {
+            try {
+                const iframeDoc = iframe.contentDocument;
+                const output = document.getElementById('access-output');
+                output.innerHTML = `<span class="success">✓ Got contentDocument:</span><br>` +
+                    `Title: ${iframeDoc.title}<br>` +
+                    `URL: ${iframeDoc.URL}<br>` +
+                    `Ready State: ${iframeDoc.readyState}<br>` +
+                    `Elements: ${iframeDoc.getElementsByTagName('*').length}`;
+            } catch (e) {
+                document.getElementById('access-output').innerHTML = `Error: ${e.message}`;
+            }
+        }
+        
+        // Parent → Iframe: Change text
+        function changeIframeText() {
+            try {
+                const iframeDoc = iframe.contentDocument;
+                const element = iframeDoc.getElementById('iframe-demo');
+                if (element) {
+                    const newText = `Modified by parent at ${new Date().toLocaleTimeString()}`;
+                    element.textContent = newText;
+                    document.getElementById('modify-output').innerHTML = 
+                        `<span class="success">✓ Changed iframe text to:</span><br>${newText}`;
+                } else {
+                    document.getElementById('modify-output').innerHTML = 'Element not found in iframe';
+                }
+            } catch (e) {
+                document.getElementById('modify-output').innerHTML = `Error: ${e.message}`;
+            }
+        }
+        
+        // Parent → Iframe: Change style
+        function changeIframeStyle() {
+            try {
+                const iframeDoc = iframe.contentDocument;
+                const element = iframeDoc.getElementById('iframe-demo');
+                if (element) {
+                    const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f7b731', '#5f27cd'];
+                    const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                    element.style.backgroundColor = randomColor;
+                    element.style.transform = 'scale(1.05)';
+                    element.style.transition = 'all 0.3s';
+                    setTimeout(() => {
+                        element.style.transform = 'scale(1)';
+                    }, 300);
+                    document.getElementById('modify-output').innerHTML = 
+                        `<span class="success">✓ Changed iframe style:</span><br>Background: ${randomColor}`;
+                }
+            } catch (e) {
+                document.getElementById('modify-output').innerHTML = `Error: ${e.message}`;
+            }
+        }
+        
+        // Parent → Iframe: Add element
+        function addIframeElement() {
+            try {
+                const iframeDoc = iframe.contentDocument;
+                const newDiv = iframeDoc.createElement('div');
+                newDiv.textContent = `Element added by parent at ${new Date().toLocaleTimeString()}`;
+                newDiv.style.cssText = 'background: #d4edda; border: 2px solid #28a745; padding: 10px; margin: 10px 0; border-radius: 4px;';
+                iframeDoc.body.appendChild(newDiv);
+                document.getElementById('modify-output').innerHTML = 
+                    `<span class="success">✓ Added new element to iframe</span>`;
+            } catch (e) {
+                document.getElementById('modify-output').innerHTML = `Error: ${e.message}`;
+            }
+        }
+        
+        // Parent → Iframe: Call function
+        function callIframeFunction() {
+            try {
+                const iframeWindow = iframe.contentWindow;
+                if (typeof iframeWindow.iframeFunction === 'function') {
+                    const result = iframeWindow.iframeFunction('Hello from parent!');
+                    document.getElementById('function-output').innerHTML = 
+                        `<span class="success">✓ Called iframe function:</span><br>Returned: ${result}`;
+                } else {
+                    document.getElementById('function-output').innerHTML = 'Function not found in iframe';
+                }
+            } catch (e) {
+                document.getElementById('function-output').innerHTML = `Error: ${e.message}`;
+            }
+        }
+        
+        // Parent → Iframe: Get variable
+        function getIframeVariable() {
+            try {
+                const iframeWindow = iframe.contentWindow;
+                const iframeData = iframeWindow.iframeData;
+                document.getElementById('function-output').innerHTML = 
+                    `<span class="success">✓ Got iframe variable:</span><br>` +
+                    JSON.stringify(iframeData, null, 2);
+            } catch (e) {
+                document.getElementById('function-output').innerHTML = `Error: ${e.message}`;
+            }
+        }
+        
+        // Parent → Iframe: Query elements
+        function queryIframeElements() {
+            try {
+                const iframeDoc = iframe.contentDocument;
+                const buttons = iframeDoc.querySelectorAll('button');
+                const inputs = iframeDoc.querySelectorAll('input');
+                document.getElementById('query-output').innerHTML = 
+                    `<span class="success">✓ Queried iframe DOM:</span><br>` +
+                    `Buttons: ${buttons.length}<br>` +
+                    `Inputs: ${inputs.length}<br>` +
+                    `Total elements: ${iframeDoc.getElementsByTagName('*').length}`;
+            } catch (e) {
+                document.getElementById('query-output').innerHTML = `Error: ${e.message}`;
+            }
+        }
+        
+        // Parent → Iframe: Get title
+        function getIframeTitle() {
+            try {
+                const iframeDoc = iframe.contentDocument;
+                document.getElementById('query-output').innerHTML = 
+                    `<span class="success">✓ Iframe title:</span><br>${iframeDoc.title}`;
+            } catch (e) {
+                document.getElementById('query-output').innerHTML = `Error: ${e.message}`;
+            }
+        }
+        
+        // Advanced: Add event listener to iframe
+        function addIframeEventListener() {
+            try {
+                const iframeDoc = iframe.contentDocument;
+                iframeDoc.addEventListener('click', function(e) {
+                    document.getElementById('event-output').innerHTML = 
+                        `<span class="success">✓ Click detected in iframe:</span><br>` +
+                        `Target: ${e.target.tagName}<br>` +
+                        `Coordinates: (${e.clientX}, ${e.clientY})`;
+                });
+                document.getElementById('event-output').innerHTML = 
+                    '<span class="info">Event listener added. Click inside the iframe!</span>';
+            } catch (e) {
+                document.getElementById('event-output').innerHTML = `Error: ${e.message}`;
+            }
+        }
+        
+        // Advanced: Trigger event in iframe
+        function triggerIframeEvent() {
+            try {
+                const iframeDoc = iframe.contentDocument;
+                const iframeWindow = iframe.contentWindow;
+                const event = new iframeWindow.CustomEvent('parentTriggered', {
+                    detail: { message: 'Event triggered from parent', timestamp: Date.now() }
+                });
+                iframeDoc.dispatchEvent(event);
+                document.getElementById('event-output').innerHTML = 
+                    `<span class="success">✓ Custom event dispatched to iframe</span>`;
+            } catch (e) {
+                document.getElementById('event-output').innerHTML = `Error: ${e.message}`;
+            }
+        }
+        
+        // Advanced: Check window relationship
+        function checkWindowRelationship() {
+            try {
+                const iframeWindow = iframe.contentWindow;
+                const output = document.getElementById('window-output');
+                output.innerHTML = 
+                    `<span class="success">✓ Window Relationships:</span><br>` +
+                    `parent === window: ${window.parent === window}<br>` +
+                    `top === window: ${window.top === window}<br>` +
+                    `iframe.contentWindow.parent === window: ${iframeWindow.parent === window}<br>` +
+                    `iframe.contentWindow.top === window: ${iframeWindow.top === window}<br>` +
+                    `iframe.contentWindow.frameElement === iframe: ${iframeWindow.frameElement === iframe}`;
+            } catch (e) {
+                document.getElementById('window-output').innerHTML = `Error: ${e.message}`;
+            }
+        }
+        
+        // Advanced: Compare origins
+        function compareOrigins() {
+            try {
+                const iframeWindow = iframe.contentWindow;
+                const output = document.getElementById('window-output');
+                output.innerHTML = 
+                    `<span class="success">✓ Origin Information:</span><br>` +
+                    `Parent origin: ${window.location.origin}<br>` +
+                    `Iframe origin: ${iframeWindow.location.origin}<br>` +
+                    `Same origin: ${window.location.origin === iframeWindow.location.origin}`;
+            } catch (e) {
+                document.getElementById('window-output').innerHTML = `Error: ${e.message}`;
+            }
+        }
+        
+        // ===== HISTORY & NAVIGATION API FUNCTIONS =====
+        
+        // Navigation: Navigate iframe to a URL
+        function navigateIframeTo(url) {
+            try {
+                iframe.src = url;
+                const output = document.getElementById('nav-load-output');
+                if (output) {
+                    output.innerHTML = `<span class="success">✓ Navigating to:</span> ${url}`;
+                }
+                document.getElementById('navigation-output').innerHTML = 
+                    `<span class="success">✓ Navigating iframe to:</span><br>${url}`;
+            } catch (e) {
+                document.getElementById('navigation-output').innerHTML = `Error: ${e.message}`;
+            }
+        }
+        
+        // Navigation: Go back in iframe history
+        function iframeBack() {
+            try {
+                iframe.contentWindow.history.back();
+                const output = document.getElementById('history-nav-output');
+                if (output) {
+                    output.innerHTML = '<span class="info">⬅️ history.back() called</span>';
+                }
+                document.getElementById('navigation-output').innerHTML = 
+                    '<span class="info">Iframe history.back() called</span>';
+            } catch (e) {
+                document.getElementById('navigation-output').innerHTML = `Error: ${e.message}`;
+            }
+        }
+        
+        // Navigation: Go forward in iframe history
+        function iframeForward() {
+            try {
+                iframe.contentWindow.history.forward();
+                const output = document.getElementById('history-nav-output');
+                if (output) {
+                    output.innerHTML = '<span class="info">➡️ history.forward() called</span>';
+                }
+                document.getElementById('navigation-output').innerHTML = 
+                    '<span class="info">Iframe history.forward() called</span>';
+            } catch (e) {
+                document.getElementById('navigation-output').innerHTML = `Error: ${e.message}`;
+            }
+        }
+        
+        // Navigation: Go to specific point in history
+        function iframeGo(delta) {
+            try {
+                iframe.contentWindow.history.go(delta);
+                const output = document.getElementById('history-nav-output');
+                if (output) {
+                    output.innerHTML = `<span class="info">history.go(${delta}) called</span>`;
+                }
+            } catch (e) {
+                const output = document.getElementById('history-nav-output');
+                if (output) {
+                    output.innerHTML = `Error: ${e.message}`;
+                }
+            }
+        }
+        
+        // History: Push state to iframe history
+        function iframePushState() {
+            try {
+                const iframeWindow = iframe.contentWindow;
+                const state = { 
+                    action: 'pushState', 
+                    timestamp: Date.now(),
+                    page: iframeWindow.location.pathname,
+                    data: 'Custom data from parent'
+                };
+                const url = iframeWindow.location.pathname + '?pushed=' + Date.now();
+                iframeWindow.history.pushState(state, '', url);
+                
+                const output = document.getElementById('history-state-output');
+                if (output) {
+                    output.innerHTML = 
+                        `<span class="success">✓ pushState() called:</span><br>` +
+                        `URL: ${url}<br>` +
+                        `State: ${JSON.stringify(state)}<br>` +
+                        `Length: ${iframeWindow.history.length}`;
+                }
+            } catch (e) {
+                document.getElementById('history-state-output').innerHTML = `Error: ${e.message}`;
+            }
+        }
+        
+        // History: Replace state in iframe history
+        function iframeReplaceState() {
+            try {
+                const iframeWindow = iframe.contentWindow;
+                const state = { 
+                    action: 'replaceState', 
+                    timestamp: Date.now(),
+                    page: iframeWindow.location.pathname,
+                    replaced: true
+                };
+                const url = iframeWindow.location.pathname + '?replaced=' + Date.now();
+                iframeWindow.history.replaceState(state, '', url);
+                
+                const output = document.getElementById('history-state-output');
+                if (output) {
+                    output.innerHTML = 
+                        `<span class="success">✓ replaceState() called:</span><br>` +
+                        `URL: ${url}<br>` +
+                        `State: ${JSON.stringify(state)}<br>` +
+                        `Length: ${iframeWindow.history.length}`;
+                }
+            } catch (e) {
+                document.getElementById('history-state-output').innerHTML = `Error: ${e.message}`;
+            }
+        }
+        
+        // History: Show current history state
+        function showIframeHistoryState() {
+            try {
+                const iframeWindow = iframe.contentWindow;
+                const output = document.getElementById('history-state-output');
+                if (output) {
+                    output.innerHTML = 
+                        `<span class="success">✓ Current History State:</span><br>` +
+                        `State: ${JSON.stringify(iframeWindow.history.state)}<br>` +
+                        `Length: ${iframeWindow.history.length}<br>` +
+                        `ScrollRestoration: ${iframeWindow.history.scrollRestoration}`;
+                }
+            } catch (e) {
+                document.getElementById('history-state-output').innerHTML = `Error: ${e.message}`;
+            }
+        }
+        
+        // History: Show history length
+        function showIframeHistoryLength() {
+            try {
+                const iframeWindow = iframe.contentWindow;
+                const output = document.getElementById('history-state-output');
+                if (output) {
+                    output.innerHTML = 
+                        `<span class="success">✓ History Stack:</span><br>` +
+                        `Length: ${iframeWindow.history.length} entries<br>` +
+                        `Current URL: ${iframeWindow.location.href}`;
+                }
+            } catch (e) {
+                document.getElementById('history-state-output').innerHTML = `Error: ${e.message}`;
+            }
+        }
+        
+        // URL: Get iframe location
+        function getIframeLocation() {
+            try {
+                const iframeWindow = iframe.contentWindow;
+                const loc = iframeWindow.location;
+                const output = document.getElementById('url-output');
+                if (output) {
+                    output.innerHTML = 
+                        `<span class="success">✓ Location Object:</span><br>` +
+                        `href: ${loc.href}<br>` +
+                        `pathname: ${loc.pathname}<br>` +
+                        `search: ${loc.search}<br>` +
+                        `hash: ${loc.hash}`;
+                }
+            } catch (e) {
+                document.getElementById('url-output').innerHTML = `Error: ${e.message}`;
+            }
+        }
+        
+        // URL: Get full iframe URL
+        function getIframeURL() {
+            try {
+                const iframeWindow = iframe.contentWindow;
+                const output = document.getElementById('url-output');
+                if (output) {
+                    output.innerHTML = 
+                        `<span class="success">✓ Full URL:</span><br>` +
+                        `${iframeWindow.location.href}`;
+                }
+            } catch (e) {
+                document.getElementById('url-output').innerHTML = `Error: ${e.message}`;
+            }
+        }
+        
+        // URL: Parse iframe URL
+        function parseIframeURL() {
+            try {
+                const iframeWindow = iframe.contentWindow;
+                const url = new URL(iframeWindow.location.href);
+                const output = document.getElementById('url-output');
+                if (output) {
+                    output.innerHTML = 
+                        `<span class="success">✓ Parsed URL:</span><br>` +
+                        `protocol: ${url.protocol}<br>` +
+                        `host: ${url.host}<br>` +
+                        `hostname: ${url.hostname}<br>` +
+                        `port: ${url.port}<br>` +
+                        `pathname: ${url.pathname}<br>` +
+                        `search: ${url.search}<br>` +
+                        `hash: ${url.hash}<br>` +
+                        `origin: ${url.origin}`;
+                }
+            } catch (e) {
+                document.getElementById('url-output').innerHTML = `Error: ${e.message}`;
+            }
+        }
+        
+        // URL: Change iframe hash
+        function changeIframeHash() {
+            try {
+                const iframeWindow = iframe.contentWindow;
+                const newHash = '#section-' + Date.now();
+                iframeWindow.location.hash = newHash;
+                const output = document.getElementById('url-output');
+                if (output) {
+                    output.innerHTML = 
+                        `<span class="success">✓ Hash changed to:</span><br>` +
+                        `${newHash}`;
+                }
+            } catch (e) {
+                document.getElementById('url-output').innerHTML = `Error: ${e.message}`;
+            }
+        }
+        
+        // Reload: Normal reload
+        function reloadIframe() {
+            try {
+                iframe.contentWindow.location.reload();
+                const output = document.getElementById('reload-output');
+                if (output) {
+                    output.innerHTML = '<span class="info">🔄 Iframe reloading...</span>';
+                }
+                document.getElementById('navigation-output').innerHTML = 
+                    '<span class="info">Iframe reloaded</span>';
+            } catch (e) {
+                document.getElementById('navigation-output').innerHTML = `Error: ${e.message}`;
+            }
+        }
+        
+        // Reload: Hard reload (bypass cache)
+        function hardReloadIframe() {
+            try {
+                iframe.contentWindow.location.reload(true);
+                const output = document.getElementById('reload-output');
+                if (output) {
+                    output.innerHTML = '<span class="info">🔄 Hard reload (bypass cache)...</span>';
+                }
+            } catch (e) {
+                const output = document.getElementById('reload-output');
+                if (output) {
+                    output.innerHTML = `Error: ${e.message}`;
+                }
+            }
+        }
+        
+        // Reload: No cache reload
+        function reloadIframeNoCache() {
+            try {
+                const currentSrc = iframe.src;
+                iframe.src = currentSrc + (currentSrc.includes('?') ? '&' : '?') + '_=' + Date.now();
+                const output = document.getElementById('reload-output');
+                if (output) {
+                    output.innerHTML = '<span class="info">🔄 Reloading with cache-busting parameter...</span>';
+                }
+            } catch (e) {
+                const output = document.getElementById('reload-output');
+                if (output) {
+                    output.innerHTML = `Error: ${e.message}`;
+                }
+            }
+        }
+        
+        // ScrollRestoration: Set to auto
+        function setScrollRestorationAuto() {
+            try {
+                const iframeWindow = iframe.contentWindow;
+                if ('scrollRestoration' in iframeWindow.history) {
+                    iframeWindow.history.scrollRestoration = 'auto';
+                    const output = document.getElementById('scroll-restoration-output');
+                    if (output) {
+                        output.innerHTML = 
+                            `<span class="success">✓ ScrollRestoration set to: auto</span><br>` +
+                            `Browser will automatically restore scroll position on navigation.`;
+                    }
+                } else {
+                    document.getElementById('scroll-restoration-output').innerHTML = 
+                        '<span class="info">scrollRestoration not supported</span>';
+                }
+            } catch (e) {
+                document.getElementById('scroll-restoration-output').innerHTML = `Error: ${e.message}`;
+            }
+        }
+        
+        // ScrollRestoration: Set to manual
+        function setScrollRestorationManual() {
+            try {
+                const iframeWindow = iframe.contentWindow;
+                if ('scrollRestoration' in iframeWindow.history) {
+                    iframeWindow.history.scrollRestoration = 'manual';
+                    const output = document.getElementById('scroll-restoration-output');
+                    if (output) {
+                        output.innerHTML = 
+                            `<span class="success">✓ ScrollRestoration set to: manual</span><br>` +
+                            `You must manually manage scroll position on navigation.`;
+                    }
+                } else {
+                    document.getElementById('scroll-restoration-output').innerHTML = 
+                        '<span class="info">scrollRestoration not supported</span>';
+                }
+            } catch (e) {
+                document.getElementById('scroll-restoration-output').innerHTML = `Error: ${e.message}`;
+            }
+        }
+        
+        // ScrollRestoration: Get current value
+        function getScrollRestoration() {
+            try {
+                const iframeWindow = iframe.contentWindow;
+                if ('scrollRestoration' in iframeWindow.history) {
+                    const mode = iframeWindow.history.scrollRestoration;
+                    const output = document.getElementById('scroll-restoration-output');
+                    if (output) {
+                        output.innerHTML = 
+                            `<span class="success">✓ Current ScrollRestoration:</span><br>` +
+                            `Mode: <strong>${mode}</strong><br>` +
+                            `${mode === 'auto' ? 'Browser manages scroll position' : 'Manual scroll management required'}`;
+                    }
+                } else {
+                    document.getElementById('scroll-restoration-output').innerHTML = 
+                        '<span class="info">scrollRestoration not supported in this browser</span>';
+                }
+            } catch (e) {
+                document.getElementById('scroll-restoration-output').innerHTML = `Error: ${e.message}`;
+            }
+        }
+    </script>
+</body>
+</html>
+

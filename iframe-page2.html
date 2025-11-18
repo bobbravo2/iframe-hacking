@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iframe Page 2 - Navigation Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+            background: linear-gradient(135deg, #43cea2 0%, #185a9d 100%);
+        }
+        
+        .iframe-header {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .iframe-header h2 {
+            color: #185a9d;
+            margin-bottom: 5px;
+        }
+        
+        .iframe-header p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .control-section {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .control-section h3 {
+            color: #185a9d;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #43cea2 0%, #185a9d 100%);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            margin: 3px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(24, 90, 157, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .nav-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        .output {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 4px;
+            padding: 10px;
+            margin-top: 10px;
+            min-height: 40px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #212529;
+        }
+        
+        .success {
+            color: #28a745;
+            font-weight: bold;
+        }
+        
+        .info {
+            color: #17a2b8;
+            font-style: italic;
+        }
+        
+        code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #e83e8c;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .badge {
+            background: #185a9d;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+        
+        .feature-box {
+            background: #e8f5e9;
+            border: 2px solid #4caf50;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="iframe-header">
+        <h2>📄 Page 2 - Navigation Demo <span class="badge">SECOND PAGE</span></h2>
+        <p>This is the second page demonstrating iframe navigation with History API.</p>
+    </div>
+    
+    <!-- Navigation Controls -->
+    <div class="control-section">
+        <h3>Navigation Controls</h3>
+        <button class="nav-button" onclick="navigateToPage1()">← Go to Page 1</button>
+        <button class="nav-button" onclick="navigateWithParent()">Navigate via Parent</button>
+        <div class="output" id="nav-output">Use buttons to navigate between pages...</div>
+    </div>
+    
+    <!-- History API Demo -->
+    <div class="control-section">
+        <h3>History API Methods</h3>
+        
+        <div style="margin-bottom: 10px;">
+            <strong>History Navigation:</strong><br>
+            <button onclick="goBack()">history.back()</button>
+            <button onclick="goForward()">history.forward()</button>
+            <button onclick="showHistoryLength()">Show Length</button>
+        </div>
+        
+        <div style="margin-bottom: 10px;">
+            <strong>History State:</strong><br>
+            <button onclick="pushState()">pushState()</button>
+            <button onclick="replaceState()">replaceState()</button>
+            <button onclick="showCurrentState()">Show State</button>
+        </div>
+        
+        <div class="output" id="history-output">Click buttons to interact with History API...</div>
+    </div>
+    
+    <!-- Page 2 Specific Features -->
+    <div class="control-section">
+        <h3>Page 2 Features</h3>
+        <div class="feature-box">
+            <h4 style="color: #2e7d32; margin-bottom: 10px;">🌟 Unique Content</h4>
+            <p>This page demonstrates:</p>
+            <ul style="margin-left: 20px; margin-top: 10px; line-height: 1.8;">
+                <li>Navigation between multiple iframe pages</li>
+                <li>History API methods (pushState, replaceState, back, forward)</li>
+                <li>State management across navigation</li>
+                <li>URL manipulation within iframes</li>
+                <li>Parent-controlled navigation</li>
+            </ul>
+        </div>
+        <button onclick="sendMessageToParent()">Send Message to Parent</button>
+        <button onclick="modifyParentFromPage2()">Modify Parent Element</button>
+        <div class="output" id="feature-output">Ready for interaction...</div>
+    </div>
+    
+    <!-- Window Information -->
+    <div class="control-section">
+        <h3>Current Location Info</h3>
+        <button onclick="showLocationInfo()">Show Location</button>
+        <button onclick="showHistoryInfo()">Show History Info</button>
+        <div class="output" id="info-output">Click to see information...</div>
+    </div>
+    
+    <script>
+        // Listen for popstate events (back/forward navigation)
+        window.addEventListener('popstate', function(event) {
+            document.getElementById('history-output').innerHTML = 
+                `<span class="success">✓ popstate event fired:</span><br>` +
+                `State: ${JSON.stringify(event.state)}<br>` +
+                `Location: ${window.location.pathname}`;
+        });
+        
+        // Log page load
+        console.log('Page 2 loaded!');
+        console.log('Location:', window.location.href);
+        
+        // Navigate to page 1
+        function navigateToPage1() {
+            window.location.href = '/iframe.html';
+            document.getElementById('nav-output').innerHTML = 
+                '<span class="info">Navigating to Page 1...</span>';
+        }
+        
+        // Navigate via parent
+        function navigateWithParent() {
+            try {
+                const iframe = window.parent.document.getElementById('myIframe');
+                if (iframe) {
+                    iframe.src = '/iframe.html';
+                    document.getElementById('nav-output').innerHTML = 
+                        '<span class="success">✓ Requested parent to navigate iframe</span>';
+                }
+            } catch (e) {
+                document.getElementById('nav-output').innerHTML = `Error: ${e.message}`;
+            }
+        }
+        
+        // History.back()
+        function goBack() {
+            try {
+                window.history.back();
+                document.getElementById('history-output').innerHTML = 
+                    '<span class="info">Called history.back()...</span>';
+            } catch (e) {
+                document.getElementById('history-output').innerHTML = `Error: ${e.message}`;
+            }
+        }
+        
+        // History.forward()
+        function goForward() {
+            try {
+                window.history.forward();
+                document.getElementById('history-output').innerHTML = 
+                    '<span class="info">Called history.forward()...</span>';
+            } catch (e) {
+                document.getElementById('history-output').innerHTML = `Error: ${e.message}`;
+            }
+        }
+        
+        // Show history length
+        function showHistoryLength() {
+            const output = document.getElementById('history-output');
+            output.innerHTML = 
+                `<span class="success">✓ History length:</span><br>` +
+                `${window.history.length} entries in history stack`;
+        }
+        
+        // pushState
+        function pushState() {
+            try {
+                const state = { page: 2, action: 'pushState', timestamp: Date.now() };
+                const url = '/iframe-page2.html?state=pushed';
+                window.history.pushState(state, '', url);
+                document.getElementById('history-output').innerHTML = 
+                    `<span class="success">✓ pushState() called:</span><br>` +
+                    `New URL: ${url}<br>` +
+                    `State: ${JSON.stringify(state)}`;
+            } catch (e) {
+                document.getElementById('history-output').innerHTML = `Error: ${e.message}`;
+            }
+        }
+        
+        // replaceState
+        function replaceState() {
+            try {
+                const state = { page: 2, action: 'replaceState', timestamp: Date.now() };
+                const url = '/iframe-page2.html?state=replaced';
+                window.history.replaceState(state, '', url);
+                document.getElementById('history-output').innerHTML = 
+                    `<span class="success">✓ replaceState() called:</span><br>` +
+                    `New URL: ${url}<br>` +
+                    `State: ${JSON.stringify(state)}`;
+            } catch (e) {
+                document.getElementById('history-output').innerHTML = `Error: ${e.message}`;
+            }
+        }
+        
+        // Show current state
+        function showCurrentState() {
+            const output = document.getElementById('history-output');
+            output.innerHTML = 
+                `<span class="success">✓ Current history state:</span><br>` +
+                `State: ${JSON.stringify(window.history.state)}<br>` +
+                `Length: ${window.history.length}<br>` +
+                `ScrollRestoration: ${window.history.scrollRestoration}`;
+        }
+        
+        // Send message to parent
+        function sendMessageToParent() {
+            try {
+                const parentOutput = window.parent.document.getElementById('parent-output');
+                if (parentOutput) {
+                    parentOutput.innerHTML = 
+                        `<span class="success">✓ Message from Page 2:</span><br>` +
+                        `Hello from iframe page 2! Time: ${new Date().toLocaleTimeString()}`;
+                    document.getElementById('feature-output').innerHTML = 
+                        '<span class="success">✓ Message sent to parent</span>';
+                }
+            } catch (e) {
+                document.getElementById('feature-output').innerHTML = `Error: ${e.message}`;
+            }
+        }
+        
+        // Modify parent from page 2
+        function modifyParentFromPage2() {
+            try {
+                const parentDemo = window.parent.document.getElementById('parent-demo');
+                if (parentDemo) {
+                    parentDemo.textContent = 'Modified by Page 2!';
+                    parentDemo.style.backgroundColor = '#d1f2eb';
+                    parentDemo.style.borderColor = '#1abc9c';
+                    document.getElementById('feature-output').innerHTML = 
+                        '<span class="success">✓ Modified parent element from Page 2</span>';
+                }
+            } catch (e) {
+                document.getElementById('feature-output').innerHTML = `Error: ${e.message}`;
+            }
+        }
+        
+        // Show location info
+        function showLocationInfo() {
+            const output = document.getElementById('info-output');
+            output.innerHTML = 
+                `<span class="success">✓ Location Information:</span><br>` +
+                `href: ${window.location.href}<br>` +
+                `pathname: ${window.location.pathname}<br>` +
+                `search: ${window.location.search}<br>` +
+                `hash: ${window.location.hash}`;
+        }
+        
+        // Show history info
+        function showHistoryInfo() {
+            const output = document.getElementById('info-output');
+            output.innerHTML = 
+                `<span class="success">✓ History Information:</span><br>` +
+                `Length: ${window.history.length}<br>` +
+                `State: ${JSON.stringify(window.history.state)}<br>` +
+                `ScrollRestoration: ${window.history.scrollRestoration}`;
+        }
+    </script>
+</body>
+</html>
+

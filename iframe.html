@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iframe Content - DOM Methods Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .iframe-header {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .iframe-header h2 {
+            color: #f5576c;
+            margin-bottom: 5px;
+        }
+        
+        .iframe-header p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .control-section {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .control-section h3 {
+            color: #f5576c;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            margin: 3px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(245, 87, 108, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .iframe-demo-element {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            border: 2px solid #dee2e6;
+            border-radius: 4px;
+            font-size: 14px;
+            margin: 5px 0;
+        }
+        
+        .output {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 4px;
+            padding: 10px;
+            margin-top: 10px;
+            min-height: 40px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #212529;
+        }
+        
+        .success {
+            color: #28a745;
+            font-weight: bold;
+        }
+        
+        .info {
+            color: #17a2b8;
+            font-style: italic;
+        }
+        
+        code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #e83e8c;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .badge {
+            background: #f5576c;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="iframe-header">
+        <h2>🎯 Iframe Content - Page 1 <span class="badge">CHILD WINDOW</span></h2>
+        <p>This content is loaded inside an iframe. Use the buttons below to interact with the parent window.</p>
+    </div>
+    
+    <!-- Navigation Controls -->
+    <div class="control-section">
+        <h3>Navigation</h3>
+        <button onclick="navigateToPage2()" style="background: linear-gradient(135deg, #43cea2 0%, #185a9d 100%); padding: 10px 20px; font-weight: bold;">→ Go to Page 2</button>
+        <button onclick="navigateViaParent()">Navigate via Parent</button>
+        <button onclick="showHistoryState()">Show History State</button>
+        <div class="output" id="nav-output">Click button to navigate to Page 2...</div>
+    </div>
+    
+    <!-- Iframe Demo Element -->
+    <div class="control-section">
+        <h3>Iframe Demo Element</h3>
+        <div class="iframe-demo-element" id="iframe-demo">
+            This is an iframe element with ID: <code>iframe-demo</code><br>
+            It can be modified by the parent window.
+        </div>
+        <input type="text" id="iframe-input" value="Iframe input value" placeholder="Iframe input">
+    </div>
+    
+    <!-- Iframe → Parent Actions -->
+    <div class="control-section">
+        <h3>Iframe → Parent Actions</h3>
+        
+        <div style="margin-bottom: 10px;">
+            <strong>Access Parent Window:</strong><br>
+            <button onclick="accessParentWindow()">Access window.parent</button>
+            <button onclick="accessTopWindow()">Access window.top</button>
+            <button onclick="getFrameElement()">Get frameElement</button>
+        </div>
+        
+        <div style="margin-bottom: 10px;">
+            <strong>Modify Parent DOM:</strong><br>
+            <button onclick="modifyParentElement()">Change Parent Element</button>
+            <button onclick="modifyParentInput()">Change Parent Input</button>
+            <button onclick="addParentElement()">Add Element to Parent</button>
+        </div>
+        
+        <div style="margin-bottom: 10px;">
+            <strong>Call Parent Functions:</strong><br>
+            <button onclick="callParentFunction()">Call Parent Function</button>
+            <button onclick="getParentVariable()">Get Parent Variable</button>
+            <button onclick="queryParentDOM()">Query Parent DOM</button>
+        </div>
+        
+        <div class="output" id="iframe-output">Ready to interact with parent...</div>
+    </div>
+    
+    <!-- Window Information -->
+    <div class="control-section">
+        <h3>Window Information</h3>
+        <button onclick="showWindowInfo()">Show Window Info</button>
+        <button onclick="showLocationInfo()">Show Location Info</button>
+        <button onclick="checkParentRelationship()">Check Parent Relationship</button>
+        <div class="output" id="info-output">Click buttons to see information...</div>
+    </div>
+    
+    <!-- Event Listeners -->
+    <div class="control-section">
+        <h3>Event Handling</h3>
+        <button onclick="listenToParentEvents()">Listen to Parent Events</button>
+        <button onclick="triggerCustomEvent()">Trigger Event in Parent</button>
+        <div class="output" id="event-output">No events yet...</div>
+    </div>
+    
+    <script>
+        // Function that can be called from parent
+        function iframeFunction(message) {
+            const output = document.getElementById('iframe-output');
+            output.innerHTML = `<span class="success">✓ Function called from parent:</span><br>${message}`;
+            return 'Response from iframe function';
+        }
+        
+        // Iframe variable that can be accessed from parent
+        window.iframeData = {
+            name: 'Iframe Window',
+            timestamp: new Date().toISOString(),
+            loaded: true,
+            location: window.location.href
+        };
+        
+        // Listen for custom events from parent
+        document.addEventListener('parentTriggered', function(e) {
+            const output = document.getElementById('event-output');
+            output.innerHTML = `<span class="success">✓ Received custom event from parent:</span><br>` +
+                JSON.stringify(e.detail, null, 2);
+        });
+        
+        // Iframe → Parent: Access parent window
+        function accessParentWindow() {
+            try {
+                const parentWin = window.parent;
+                const output = document.getElementById('iframe-output');
+                output.innerHTML = `<span class="success">✓ Accessed window.parent:</span><br>` +
+                    `Location: ${parentWin.location.href}<br>` +
+                    `Type: ${typeof parentWin}<br>` +
+                    `Is same as top: ${parentWin === window.top}`;
+            } catch (e) {
+                document.getElementById('iframe-output').innerHTML = `Error: ${e.message}`;
+            }
+        }
+        
+        // Iframe → Parent: Access top window
+        function accessTopWindow() {
+            try {
+                const topWin = window.top;
+                const output = document.getElementById('iframe-output');
+                output.innerHTML = `<span class="success">✓ Accessed window.top:</span><br>` +
+                    `Location: ${topWin.location.href}<br>` +
+                    `Is same as parent: ${topWin === window.parent}<br>` +
+                    `Frames count: ${topWin.frames.length}`;
+            } catch (e) {
+                document.getElementById('iframe-output').innerHTML = `Error: ${e.message}`;
+            }
+        }
+        
+        // Iframe → Parent: Get frameElement
+        function getFrameElement() {
+            try {
+                const frameElem = window.frameElement;
+                const output = document.getElementById('iframe-output');
+                if (frameElem) {
+                    output.innerHTML = `<span class="success">✓ Got frameElement:</span><br>` +
+                        `Tag: ${frameElem.tagName}<br>` +
+                        `ID: ${frameElem.id}<br>` +
+                        `Width: ${frameElem.offsetWidth}px<br>` +
+                        `Height: ${frameElem.offsetHeight}px`;
+                } else {
+                    output.innerHTML = 'frameElement is null (not in an iframe?)';
+                }
+            } catch (e) {
+                document.getElementById('iframe-output').innerHTML = `Error: ${e.message}`;
+            }
+        }
+        
+        // Iframe → Parent: Modify parent element
+        function modifyParentElement() {
+            try {
+                const parentDoc = window.parent.document;
+                const element = parentDoc.getElementById('parent-demo');
+                if (element) {
+                    const newText = `Modified by iframe at ${new Date().toLocaleTimeString()}`;
+                    element.textContent = newText;
+                    element.style.backgroundColor = '#d1ecf1';
+                    element.style.borderColor = '#0c5460';
+                    document.getElementById('iframe-output').innerHTML = 
+                        `<span class="success">✓ Modified parent element:</span><br>${newText}`;
+                } else {
+                    document.getElementById('iframe-output').innerHTML = 'Parent element not found';
+                }
+            } catch (e) {
+                document.getElementById('iframe-output').innerHTML = `Error: ${e.message}`;
+            }
+        }
+        
+        // Iframe → Parent: Modify parent input
+        function modifyParentInput() {
+            try {
+                const parentDoc = window.parent.document;
+                const input = parentDoc.getElementById('parent-input');
+                if (input) {
+                    const newValue = `Updated by iframe at ${new Date().toLocaleTimeString()}`;
+                    input.value = newValue;
+                    input.style.backgroundColor = '#d4edda';
+                    document.getElementById('iframe-output').innerHTML = 
+                        `<span class="success">✓ Modified parent input value</span>`;
+                } else {
+                    document.getElementById('iframe-output').innerHTML = 'Parent input not found';
+                }
+            } catch (e) {
+                document.getElementById('iframe-output').innerHTML = `Error: ${e.message}`;
+            }
+        }
+        
+        // Iframe → Parent: Add element to parent
+        function addParentElement() {
+            try {
+                const parentDoc = window.parent.document;
+                const parentOutput = parentDoc.getElementById('parent-output');
+                if (parentOutput) {
+                    const message = `Element added by iframe at ${new Date().toLocaleTimeString()}`;
+                    parentOutput.innerHTML = `<span class="success">✓ Message from iframe:</span><br>${message}`;
+                    parentOutput.style.backgroundColor = '#d4edda';
+                    document.getElementById('iframe-output').innerHTML = 
+                        `<span class="success">✓ Added content to parent output</span>`;
+                } else {
+                    document.getElementById('iframe-output').innerHTML = 'Parent output element not found';
+                }
+            } catch (e) {
+                document.getElementById('iframe-output').innerHTML = `Error: ${e.message}`;
+            }
+        }
+        
+        // Iframe → Parent: Call parent function
+        function callParentFunction() {
+            try {
+                const parentWin = window.parent;
+                if (typeof parentWin.parentFunction === 'function') {
+                    const result = parentWin.parentFunction('Hello from iframe!');
+                    document.getElementById('iframe-output').innerHTML = 
+                        `<span class="success">✓ Called parent function:</span><br>Returned: ${result}`;
+                } else {
+                    document.getElementById('iframe-output').innerHTML = 'Parent function not found';
+                }
+            } catch (e) {
+                document.getElementById('iframe-output').innerHTML = `Error: ${e.message}`;
+            }
+        }
+        
+        // Iframe → Parent: Get parent variable
+        function getParentVariable() {
+            try {
+                const parentWin = window.parent;
+                const parentData = parentWin.parentData;
+                document.getElementById('iframe-output').innerHTML = 
+                    `<span class="success">✓ Got parent variable:</span><br>` +
+                    JSON.stringify(parentData, null, 2);
+            } catch (e) {
+                document.getElementById('iframe-output').innerHTML = `Error: ${e.message}`;
+            }
+        }
+        
+        // Iframe → Parent: Query parent DOM
+        function queryParentDOM() {
+            try {
+                const parentDoc = window.parent.document;
+                const buttons = parentDoc.querySelectorAll('button');
+                const panels = parentDoc.querySelectorAll('.panel');
+                const title = parentDoc.title;
+                document.getElementById('iframe-output').innerHTML = 
+                    `<span class="success">✓ Queried parent DOM:</span><br>` +
+                    `Title: ${title}<br>` +
+                    `Buttons: ${buttons.length}<br>` +
+                    `Panels: ${panels.length}`;
+            } catch (e) {
+                document.getElementById('iframe-output').innerHTML = `Error: ${e.message}`;
+            }
+        }
+        
+        // Show window information
+        function showWindowInfo() {
+            try {
+                const output = document.getElementById('info-output');
+                output.innerHTML = 
+                    `<span class="success">✓ Window Information:</span><br>` +
+                    `window.name: "${window.name}"<br>` +
+                    `window.self === window: ${window.self === window}<br>` +
+                    `window.parent === window: ${window.parent === window}<br>` +
+                    `window.top === window: ${window.top === window}<br>` +
+                    `In iframe: ${window.frameElement !== null}`;
+            } catch (e) {
+                document.getElementById('info-output').innerHTML = `Error: ${e.message}`;
+            }
+        }
+        
+        // Show location information
+        function showLocationInfo() {
+            try {
+                const output = document.getElementById('info-output');
+                output.innerHTML = 
+                    `<span class="success">✓ Location Information:</span><br>` +
+                    `href: ${window.location.href}<br>` +
+                    `origin: ${window.location.origin}<br>` +
+                    `pathname: ${window.location.pathname}<br>` +
+                    `protocol: ${window.location.protocol}`;
+            } catch (e) {
+                document.getElementById('info-output').innerHTML = `Error: ${e.message}`;
+            }
+        }
+        
+        // Check parent relationship
+        function checkParentRelationship() {
+            try {
+                const output = document.getElementById('info-output');
+                const sameOrigin = window.location.origin === window.parent.location.origin;
+                output.innerHTML = 
+                    `<span class="success">✓ Parent Relationship:</span><br>` +
+                    `Has parent: ${window.parent !== window}<br>` +
+                    `Same origin: ${sameOrigin}<br>` +
+                    `Can access parent DOM: ${sameOrigin}<br>` +
+                    `Parent location: ${window.parent.location.href}`;
+            } catch (e) {
+                document.getElementById('info-output').innerHTML = `Error: ${e.message}`;
+            }
+        }
+        
+        // Listen to parent events
+        function listenToParentEvents() {
+            try {
+                const parentDoc = window.parent.document;
+                parentDoc.addEventListener('click', function(e) {
+                    document.getElementById('event-output').innerHTML = 
+                        `<span class="success">✓ Parent click detected:</span><br>` +
+                        `Target: ${e.target.tagName}<br>` +
+                        `Time: ${new Date().toLocaleTimeString()}`;
+                }, { once: true });
+                document.getElementById('event-output').innerHTML = 
+                    '<span class="info">Listening for next parent click...</span>';
+            } catch (e) {
+                document.getElementById('event-output').innerHTML = `Error: ${e.message}`;
+            }
+        }
+        
+        // Trigger custom event in parent
+        function triggerCustomEvent() {
+            try {
+                const parentDoc = window.parent.document;
+                const event = new CustomEvent('iframeTriggered', {
+                    detail: { 
+                        message: 'Event triggered from iframe',
+                        timestamp: Date.now(),
+                        source: 'iframe.html'
+                    }
+                });
+                parentDoc.dispatchEvent(event);
+                document.getElementById('event-output').innerHTML = 
+                    `<span class="success">✓ Custom event dispatched to parent</span>`;
+            } catch (e) {
+                document.getElementById('event-output').innerHTML = `Error: ${e.message}`;
+            }
+        }
+        
+        // Navigation: Navigate to Page 2
+        function navigateToPage2() {
+            try {
+                window.location.href = '/iframe-page2.html';
+                document.getElementById('nav-output').innerHTML = 
+                    '<span class="info">Navigating to Page 2...</span>';
+            } catch (e) {
+                document.getElementById('nav-output').innerHTML = `Error: ${e.message}`;
+            }
+        }
+        
+        // Navigation: Navigate via parent
+        function navigateViaParent() {
+            try {
+                const iframe = window.parent.document.getElementById('myIframe');
+                if (iframe) {
+                    iframe.src = '/iframe-page2.html';
+                    document.getElementById('nav-output').innerHTML = 
+                        '<span class="success">✓ Requested parent to navigate to Page 2</span>';
+                }
+            } catch (e) {
+                document.getElementById('nav-output').innerHTML = `Error: ${e.message}`;
+            }
+        }
+        
+        // Navigation: Show history state
+        function showHistoryState() {
+            try {
+                document.getElementById('nav-output').innerHTML = 
+                    `<span class="success">✓ History State:</span><br>` +
+                    `State: ${JSON.stringify(window.history.state)}<br>` +
+                    `Length: ${window.history.length}<br>` +
+                    `Location: ${window.location.pathname}`;
+            } catch (e) {
+                document.getElementById('nav-output').innerHTML = `Error: ${e.message}`;
+            }
+        }
+        
+        // Listen for popstate events
+        window.addEventListener('popstate', function(event) {
+            console.log('popstate event on Page 1:', event.state);
+        });
+        
+        // Log when iframe loads
+        console.log('Iframe Page 1 loaded successfully!');
+        console.log('Parent window:', window.parent);
+        console.log('Top window:', window.top);
+        console.log('Frame element:', window.frameElement);
+    </script>
+</body>
+</html>
+

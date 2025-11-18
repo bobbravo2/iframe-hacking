@@ -1,0 +1,16 @@
+{
+  "name": "iframe-dom-demo",
+  "version": "1.0.0",
+  "description": "Interactive demo of iframe DOM methods for same-origin frames",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": ["iframe", "dom", "express"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
+
